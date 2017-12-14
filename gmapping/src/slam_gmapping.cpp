@@ -181,6 +181,11 @@ void SlamGMapping::init()
   if(!private_nh_.getParam("odom_frame", odom_frame_))
     odom_frame_ = "odom";
 
+  // Update frame with proper tf_prefix
+  odom_frame_ = tf_.resolve(odom_frame_);
+  map_frame_ = tf_.resolve(map_frame_);
+  base_frame_ = tf_.resolve(base_frame_);
+
   private_nh_.param("transform_publish_period", transform_publish_period_, 0.05);
 
   double tmp;
@@ -762,7 +767,7 @@ SlamGMapping::updateMap(const sensor_msgs::LaserScan& scan)
 
   //make sure to set the header information on the map
   map_.map.header.stamp = ros::Time::now();
-  map_.map.header.frame_id = tf_.resolve( map_frame_ );
+  map_.map.header.frame_id = map_frame_;
 
   sst_.publish(map_.map);
   sstm_.publish(map_.map.info);
